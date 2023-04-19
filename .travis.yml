@@ -14,15 +14,10 @@ after_success:
   - docker build -t yichen/multi-nginx ./nginx
   - docker build -t yichen/multi-server ./server
   - docker build -t yichen/multi-worker ./worker
-
-deploy:
-  provider: elasticbeanstalk
-  region: "us-west-2"
-  app: "react-test"
-  env: "Dockerreact-env"
-  bucket_name: "elasticbeanstalk-us-west-2-689726012021"
-  bucket_path: "react-test"
-  on: 
-    branch: main
-  access_key_id: $AWS_ACCESS_KEY
-  secrect_access_key: "$AWS_SECRECT_KEY"
+# Log in to the Docker CLI
+  - echo "$DOCKER_PASSWORD" docker login -u "$DOCKER_ID" --password-stdin
+# Push above images to Docker hub
+  - docker push yichen/multi-client
+  - docker push yichen/multi-nginx
+  - docker push yichen/multi-server
+  - docker push yichen/multi-worker
