@@ -1,0 +1,28 @@
+language: generic
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t yichen/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true yichen/react-test npm test
+
+after_success: 
+  - docker build -t yichen/multi-client ./client 
+  - docker build -t yichen/multi-nginx ./nginx
+  - docker build -t yichen/multi-server ./server
+  - docker build -t yichen/multi-worker ./worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: "us-west-2"
+  app: "react-test"
+  env: "Dockerreact-env"
+  bucket_name: "elasticbeanstalk-us-west-2-689726012021"
+  bucket_path: "react-test"
+  on: 
+    branch: main
+  access_key_id: $AWS_ACCESS_KEY
+  secrect_access_key: "$AWS_SECRECT_KEY"
